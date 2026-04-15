@@ -1,0 +1,230 @@
+package com.example.guardiantrack.ui.dashboard
+
+import android.content.Intent
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.guardiantrack.ui.components.*
+import com.example.guardiantrack.ui.theme.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.ui.platform.LocalLifecycleOwner
+
+@Composable
+fun DashboardScreen(
+    viewModel: DashboardViewModel,
+    onAlertClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val lifecycleOwner = LocalLifecycleOwner.current
+    
+    // Observer pour rafraîchir les données (GPS/Service) dès que l'écran devient actif
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                viewModel.refreshStatus() 
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(1000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "pulseScale"
+    )
+
+    val magnitudeAnimated by animateFloatAsState(
+        targetValue = uiState.currentMagnitude,
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessLow
+        ),
+        label = "magnitude"
+    )
+    
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
+    ) {
+        // Header
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column {
+                Text(
+                    text = "GUARDIAN",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontFamily = FontFamily.SansSerif
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                AnimatedContent(
+                    targetState = uiState.isServiceRunning,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() },
+                    label = "serviceStatus"
+                ) { isRunning ->
+                    Text(
+                        text = if (isRunning) "SURVEILLANCE ACTIVE" else "SERVICE INACTIF",
+                        fontSize = 10.sp,
+                        color = if (isRunning) GtGreen else MaterialTheme.colorScheme.secondary,
+                        fontFamily = FontFamily.Monospace
+                    )
+                }
+            }
+
+            if (uiState.isServiceRunning) {
+                Box(contentAlignment = Alignment.Center) {
+                    RadarPulse(modifier = Modifier.size(40.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .scale(pulseScale)
+                            .background(GtGreen, RoundedCornerShape(6.dp))
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Main Card: Accelerometer
+        ScanLineCard(
+            isActive = uiState.isServiceRunning,
+            modifier = Modifier.fillMaxWidth().height(200.dp)
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Text(
+                    text = "ACCÉLÉROMÈTRE",
+                    fontSize = 10.sp,
+                    color = GtTextSecondary,
+                    fontFamily = FontFamily.Monospace
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                Row(verticalAlignment = Alignment.Bottom) {
+                    Text(
+                        text = String.format("%.2f", magnitudeAnimated),
+                        fontSize = 64.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontFamily = FontFamily.Monospace
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = "m/s²",
+                        fontSize = 16.sp,
+                        color = GtTextSecondary,
+                        fontFamily = FontFamily.Monospace,
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+
+                LinearProgressIndicator(
+                    progress = { (magnitudeAnimated / 30f).coerceIn(0f, 1f) },
+                    modifier = Modifier.fillMaxWidth().height(6.dp),
+                    color = when {
+                        magnitudeAnimated > 20f -> GtRedAlert
+                        magnitudeAnimated > 15f -> GtAmber
+                        else -> MaterialTheme.colorScheme.primary
+                    },
+                    trackColor = MaterialTheme.colorScheme.outline,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Grid: Battery and GPS
+        Row(modifier = Modifier.fillMaxWidth()) {
+            GlassCard(modifier = Modifier.weight(1f).height(130.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(text = "BATTERIE", fontSize = 9.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    val batteryColor = when {
+                        uiState.batteryLevel <= 15 -> GtRedAlert
+                        uiState.batteryLevel <= 30 -> GtAmber
+                        else -> GtGreen
+                    }
+                    Text(text = "${uiState.batteryLevel}%", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = batteryColor, fontFamily = FontFamily.Monospace)
+                    Spacer(modifier = Modifier.weight(1f))
+                    LinearProgressIndicator(
+                        progress = { uiState.batteryLevel / 100f },
+                        modifier = Modifier.fillMaxWidth().height(4.dp),
+                        color = batteryColor,
+                        trackColor = MaterialTheme.colorScheme.outline,
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.width(12.dp))
+
+            GlassCard(modifier = Modifier.weight(1f).height(130.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.size(8.dp).background(if (uiState.isGpsActive) GtGreen else GtTextSecondary, RoundedCornerShape(4.dp)))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(text = if (uiState.isGpsActive) "GPS ACTIF" else "GPS INACTIF", fontSize = 9.sp, color = if (uiState.isGpsActive) GtGreen else GtTextSecondary, fontFamily = FontFamily.Monospace)
+                    }
+                    Spacer(modifier = Modifier.height(12.dp))
+                    uiState.lastLocation?.let { loc ->
+                        Column {
+                            Row {
+                                Text(text = "LAT: ", fontSize = 10.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
+                                Text(text = "%.5f".format(loc.latitude), fontSize = 11.sp, color = GtCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                            }
+                            Row {
+                                Text(text = "LON: ", fontSize = 10.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
+                                Text(text = "%.5f".format(loc.longitude), fontSize = 11.sp, color = GtCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    } ?: Text(text = "RECHERCHE...", fontSize = 11.sp, color = GtCyan.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        AlertButton(isLoading = uiState.isLoading, onClick = onAlertClick)
+
+        uiState.alertMessage?.let { message ->
+            Spacer(modifier = Modifier.height(16.dp))
+            Snackbar(
+                modifier = Modifier.animateContentSize(),
+                action = { TextButton(onClick = { viewModel.clearAlertMessage() }) { Text("OK", color = GtCyan) } },
+                containerColor = GtBgCardElevated,
+                contentColor = GtTextPrimary,
+                shape = RoundedCornerShape(12.dp)
+            ) { Text(message) }
+        }
+    }
+}

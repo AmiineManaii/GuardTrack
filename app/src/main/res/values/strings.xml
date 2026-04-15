@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GuardianTrack</string>
+    <string name="nav_dashboard">Radar</string>
+    <string name="nav_history">Journal</string>
+    <string name="nav_settings">Config</string>
+
+    <string name="dashboard_status_active">SURVEILLANCE ACTIVE</string>
+    <string name="dashboard_status_inactive">SERVICE INACTIF</string>
+    <string name="dashboard_btn_alert">⚠ ALERTE MANUELLE</string>
+    <string name="dashboard_sensor_magnitude">Magnitude acc. (m/s²)</string>
+    <string name="dashboard_battery_label">BATTERIE</string>
+    <string name="dashboard_gps_label">LOCALISATION</string>
+    <string name="dashboard_gps_active">GPS ACTIF</string>
+    <string name="dashboard_gps_inactive">GPS INACTIF</string>
+
+    <string name="history_empty">Aucun incident enregistré</string>
+    <string name="history_export_btn">Exporter CSV</string>
+    <string name="history_delete_confirm">Supprimer cet incident ?</string>
+    <string name="history_swipe_delete">Glissez pour supprimer</string>
+
+    <string name="settings_threshold">Seuil de détection (m/s²)</string>
+    <string name="settings_dark_mode">Mode sombre</string>
+    <string name="settings_emergency_number">Numéro d\'urgence</string>
+    <string name="settings_sms_simulation">Mode Simulation SMS</string>
+    <string name="settings_sms_simulation_desc">Activer pour remplacer les SMS par des notifications (recommandé)</string>
+
+    <string name="perm_location_rationale">GuardianTrack a besoin de votre localisation GPS pour géotagger les incidents et vous localiser en cas d\'urgence.</string>
+    <string name="perm_sms_rationale">GuardianTrack peut envoyer un SMS d\'urgence automatique à votre contact configuré en cas de chute détectée.</string>
+    <string name="perm_notification_rationale">Les notifications sont nécessaires pour maintenir le service de surveillance en arrière-plan.</string>
+    <string name="perm_denied_permanent">Permission refusée définitivement. Activez-la dans Paramètres → Applications → GuardianTrack → Permissions.</string>
+    <string name="perm_open_settings">Ouvrir les Paramètres</string>
+
+    <string name="notif_service_title">GuardianTrack actif</string>
+    <string name="notif_service_text">Surveillance des capteurs en cours...</string>
+    <string name="notif_fall_title">⚠ Chute détectée !</string>
+    <string name="notif_battery_title">🔋 Batterie critique</string>
+    <string name="notif_sms_simulated">SMS simulé envoyé à %1$s</string>
+    <string name="notif_channel_service">Service de surveillance</string>
+    <string name="notif_channel_alerts">Alertes de sécurité</string>
+
+    <string name="incident_type_fall">CHUTE</string>
+    <string name="incident_type_battery">BATTERIE</string>
+    <string name="incident_type_manual">MANUELLE</string>
+
+    <string name="export_success">Fichier exporté : %1$s</string>
+    <string name="export_error">Erreur lors de l\'export</string>
+
+    <string name="provider_authority">com.example.guardiantrack.provider</string>
+</resources>

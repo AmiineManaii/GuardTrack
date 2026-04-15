@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gt_bg_deep">#FF090E1A</color>
+    <color name="gt_bg_surface">#FF111827</color>
+    <color name="gt_bg_card">#FF1C2537</color>
+    <color name="gt_bg_card_elevated">#FF243044</color>
+
+    <color name="gt_cyan">#FF00D4FF</color>
+    <color name="gt_cyan_dim">#3300D4FF</color>
+    <color name="gt_cyan_glow">#1A00D4FF</color>
+    <color name="gt_red_alert">#FFFF3B5C</color>
+    <color name="gt_red_dim">#33FF3B5C</color>
+    <color name="gt_amber">#FFFFB547</color>
+    <color name="gt_amber_dim">#33FFB547</color>
+    <color name="gt_green">#FF00E5A0</color>
+    <color name="gt_green_dim">#3300E5A0</color>
+
+    <color name="gt_text_primary">#FFE8F4FF</color>
+    <color name="gt_text_secondary">#FF6B8AA8</color>
+    <color name="gt_text_disabled">#FF3A4A5C</color>
+
+    <color name="gt_border_subtle">#1A00D4FF</color>
+    <color name="gt_border_active">#4D00D4FF</color>
+    <color name="gt_divider">#1AFFFFFF</color>
+
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>
