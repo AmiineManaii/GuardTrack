@@ -21,7 +21,6 @@ import com.example.guardiantrack.ui.settings.SettingsScreen
 import com.example.guardiantrack.ui.settings.SettingsViewModel
 import com.example.guardiantrack.ui.theme.GtBgSurface
 import com.example.guardiantrack.ui.theme.GtCyan
-import com.example.guardiantrack.ui.theme.GtCyanDim
 import com.example.guardiantrack.ui.theme.GtTextSecondary
 import com.example.guardiantrack.util.ExportHelper
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -124,8 +123,18 @@ fun GuardianTrackApp(
                 val uiState by historyViewModel.uiState.collectAsState()
                 HistoryScreen(
                     viewModel = historyViewModel,
-                    onExportCsv = { exportHelper.exportToCsv(uiState.incidents) },
-                    onExportTxt = { exportHelper.exportToTxt(uiState.incidents) }
+                    onExportCsv = { 
+                        val filename = exportHelper.exportToCsv(uiState.incidents)
+                        if (filename != null) {
+                            android.widget.Toast.makeText(context, "Export CSV réussi : $filename", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onExportTxt = { 
+                        val filename = exportHelper.exportToTxt(uiState.incidents)
+                        if (filename != null) {
+                            android.widget.Toast.makeText(context, "Export TXT réussi : $filename", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 )
             }
             composable(Screen.Settings.route) {

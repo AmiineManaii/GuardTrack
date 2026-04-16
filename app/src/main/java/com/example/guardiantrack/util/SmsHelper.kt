@@ -43,10 +43,20 @@ class SmsHelper @Inject constructor(
                 } else {
                     SmsManager.getDefault()
                 }
-                smsManager?.sendTextMessage(phoneNumber, null, message, null, null)
+                
+                // Diviser le message s'il est trop long
+                val parts = smsManager.divideMessage(message)
+                if (parts.size > 1) {
+                    smsManager.sendMultipartTextMessage(phoneNumber, null, parts, null, null)
+                } else {
+                    smsManager.sendTextMessage(phoneNumber, null, message, null, null)
+                }
+                
                 Log.i(TAG, "REAL SMS sent to $phoneNumber")
+                android.widget.Toast.makeText(context, "SMS d'urgence envoyé à $phoneNumber", android.widget.Toast.LENGTH_LONG).show()
             } catch (e: Exception) {
                 Log.e(TAG, "SMS send failed: ${e.message}")
+                android.widget.Toast.makeText(context, "Erreur lors de l'envoi du SMS: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
             }
         }
     }

@@ -19,6 +19,10 @@ import com.example.guardiantrack.ui.components.GlassCard
 import com.example.guardiantrack.ui.theme.*
 import androidx.compose.foundation.text.KeyboardOptions
 
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import com.example.guardiantrack.ui.components.CircularSlider
+
 @Composable
 fun SettingsScreen(
     viewModel: SettingsViewModel,
@@ -30,128 +34,114 @@ fun SettingsScreen(
     var contactPhone by remember { mutableStateOf("") }
     var showSavedMessage by remember { mutableStateOf(false) }
 
+    val magicGradient = Brush.verticalGradient(
+        colors = listOf(GtBgDeep, GtBgSurface)
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(magicGradient)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         Text(
-            text = "PARAMÈTRES",
-            fontSize = 24.sp,
-            color = MaterialTheme.colorScheme.onBackground,
+            text = "CONFIGURATION",
+            fontSize = 28.sp,
+            color = GtMagicCyan,
             fontFamily = FontFamily.SansSerif,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Black,
+            letterSpacing = 2.sp
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        SettingsCard(title = "Seuil de détection", subtitle = "Sensibilité de l'accéléromètre") {
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Text(
-                        text = "5",
-                        fontSize = 10.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontFamily = FontFamily.Monospace
-                    )
-                    Slider(
-                        value = uiState.threshold,
-                        onValueChange = { viewModel.setThreshold(it) },
-                        valueRange = 5f..30f,
-                        steps = 24,
-                        modifier = Modifier.weight(1f),
-                        colors = SliderDefaults.colors(
-                            thumbColor = GtCyan,
-                            activeTrackColor = GtCyan,
-                            inactiveTrackColor = MaterialTheme.colorScheme.outline
-                        )
-                    )
-                    Text(
-                        text = "30",
-                        fontSize = 10.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontFamily = FontFamily.Monospace
-                    )
-                }
+        // Circular Slider Section (Sensitivity)
+        MagicSection(title = "SENSIBILITÉ") {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Text(
-                    text = "Valeur actuelle : ${ "%.1f".format(uiState.threshold) } m/s²",
-                    fontSize = 12.sp,
-                    color = GtCyan,
-                    fontFamily = FontFamily.Monospace,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                    text = "Seuil de détection d'impact",
+                    fontSize = 14.sp,
+                    color = GtTextSecondary,
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+                
+                CircularSlider(
+                    value = uiState.threshold,
+                    onValueChange = { viewModel.setThreshold(it) },
+                    valueRange = 5f..30f,
+                    size = 180.dp
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = if (uiState.threshold < 12f) "Sensibilité Élevée" 
+                           else if (uiState.threshold < 20f) "Sensibilité Normale" 
+                           else "Sensibilité Basse",
+                    color = if (uiState.threshold < 12f) GtRedAlert else if (uiState.threshold < 20f) GtGreen else GtAmber,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 14.sp
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        SettingsCard(title = "Apparence") {
+        // Communication Section
+        MagicSection(title = "COMMUNICATIONS") {
             SettingsSwitchRow(
-                title = "Mode sombre",
-                subtitle = "Interface en thème sombre",
-                checked = uiState.darkMode,
-                onCheckedChange = { viewModel.setDarkMode(it) }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SettingsCard(title = "Notifications") {
-            SettingsSwitchRow(
-                title = "Mode Simulation SMS",
-                subtitle = "Afficher les SMS au lieu de les envoyer",
+                title = "Simulation SMS",
+                subtitle = "Mode développeur actif",
                 checked = uiState.smsSimulation,
                 onCheckedChange = { viewModel.setSmsSimulation(it) }
             )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        SettingsCard(title = "Urgence", subtitle = "Numéro principal pour les alertes") {
+            
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = GtDivider)
+            
             Column {
                 Text(
-                    text = "Numéro d'urgence",
+                    text = "Numéro d'urgence principal",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 8.dp)
+                    color = GtTextPrimary,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OutlinedTextField(
                         value = emergencyNumber,
                         onValueChange = { emergencyNumber = it.filter { c -> c.isDigit() } },
                         modifier = Modifier.weight(1f),
                         placeholder = {
-                            Text("+216 XX XXX XXX", color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f))
+                            Text("+216 XX XXX XXX", color = GtTextSecondary.copy(alpha = 0.5f))
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GtCyan,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedBorderColor = GtMagicCyan,
+                            unfocusedBorderColor = GtBorderSubtle,
+                            focusedTextColor = GtTextPrimary,
+                            unfocusedTextColor = GtTextPrimary,
+                            cursorColor = GtMagicCyan
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     )
                     Button(
                         onClick = {
                             viewModel.setEmergencyNumber(emergencyNumber)
                             showSavedMessage = true
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = GtCyan),
-                        shape = RoundedCornerShape(12.dp)
+                        colors = ButtonDefaults.buttonColors(containerColor = GtMagicCyan),
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.height(56.dp)
                     ) {
-                        Text("OK", color = GtBgDeep)
+                        Text("SAVE", color = GtBgDeep, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -161,7 +151,7 @@ fun SettingsScreen(
                     exit = fadeOut() + shrinkVertically()
                 ) {
                     Text(
-                        text = "✓ Numéro sauvegardé",
+                        text = "✓ Configuré avec succès",
                         fontSize = 12.sp,
                         color = GtGreen,
                         modifier = Modifier.padding(top = 8.dp)
@@ -170,26 +160,42 @@ fun SettingsScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        SettingsCard(title = "Contacts d'urgence", subtitle = "Liste secondaire") {
+        // Appearance
+        MagicSection(title = "STYLE") {
+            SettingsSwitchRow(
+                title = "Mode Sombre Magique",
+                subtitle = "Utiliser les couleurs cosmiques",
+                checked = uiState.darkMode,
+                onCheckedChange = { viewModel.setDarkMode(it) }
+            )
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Secondary Contacts
+        MagicSection(title = "CONTACTS SECONDAIRES") {
             Column {
                 OutlinedTextField(
                     value = contactName,
                     onValueChange = { contactName = it },
-                    label = { Text("Nom du contact") },
+                    label = { Text("Nom complet") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GtCyan,
-                        focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                        unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                        focusedBorderColor = GtMagicPurple,
+                        unfocusedBorderColor = GtBorderSubtle,
+                        focusedTextColor = GtTextPrimary,
+                        unfocusedTextColor = GtTextPrimary,
+                        focusedLabelColor = GtMagicPurple,
+                        unfocusedLabelColor = GtTextSecondary
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(16.dp)
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(12.dp))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
                     OutlinedTextField(
                         value = contactPhone,
@@ -198,13 +204,16 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GtCyan,
-                            focusedTextColor = MaterialTheme.colorScheme.onSurface,
-                            unfocusedTextColor = MaterialTheme.colorScheme.onSurface,
+                            focusedBorderColor = GtMagicPurple,
+                            unfocusedBorderColor = GtBorderSubtle,
+                            focusedTextColor = GtTextPrimary,
+                            unfocusedTextColor = GtTextPrimary,
+                            focusedLabelColor = GtMagicPurple,
+                            unfocusedLabelColor = GtTextSecondary
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(16.dp)
                     )
-                    Button(
+                    IconButton(
                         onClick = {
                             if (contactName.isNotBlank() && contactPhone.isNotBlank()) {
                                 viewModel.addContact(contactName, contactPhone)
@@ -212,60 +221,64 @@ fun SettingsScreen(
                                 contactPhone = ""
                             }
                         },
-                        modifier = Modifier.height(56.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = GtCyan),
-                        shape = RoundedCornerShape(12.dp)
+                        modifier = Modifier
+                            .size(56.dp)
+                            .background(GtMagicPurple, RoundedCornerShape(16.dp))
                     ) {
-                        Text("AJOUTER", color = GtBgDeep)
+                        Text("+", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                uiState.contacts.forEach { contact ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Text(contact.name, color = MaterialTheme.colorScheme.onSurface, fontSize = 14.sp)
-                            Text(contact.phoneNumber, color = MaterialTheme.colorScheme.onSurfaceVariant, fontSize = 12.sp)
-                        }
-                        IconButton(onClick = { viewModel.deleteContact(contact.id) }) {
-                            Text("✕", color = GtRedAlert)
+                if (uiState.contacts.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    uiState.contacts.forEach { contact ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                                .padding(12.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(contact.name, color = GtTextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                                Text(contact.phoneNumber, color = GtTextSecondary, fontSize = 13.sp)
+                            }
+                            IconButton(onClick = { viewModel.deleteContact(contact.id) }) {
+                                Text("✕", color = GtRedAlert.copy(alpha = 0.8f))
+                            }
                         }
                     }
                 }
             }
         }
+        
+        Spacer(modifier = Modifier.height(40.dp))
     }
 }
 
 @Composable
-private fun SettingsCard(
+private fun MagicSection(
     title: String,
-    subtitle: String? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    GlassCard(modifier = Modifier.fillMaxWidth()) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = title,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            if (subtitle != null) {
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = subtitle,
-                    fontSize = 12.sp,
-                    color = GtCyan
-                )
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            color = GtMagicPurple,
+            letterSpacing = 1.sp,
+            modifier = Modifier.padding(start = 8.dp, bottom = 12.dp)
+        )
+        GlassCard(
+            modifier = Modifier.fillMaxWidth(),
+            containerColor = GtBgCard.copy(alpha = 0.6f)
+        ) {
+            Column(modifier = Modifier.padding(20.dp)) {
+                content()
             }
-            Spacer(modifier = Modifier.height(16.dp))
-            content()
         }
     }
 }
@@ -285,21 +298,24 @@ private fun SettingsSwitchRow(
         Column(modifier = Modifier.weight(1f)) {
             Text(
                 text = title,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurface
+                fontSize = 16.sp,
+                color = GtTextPrimary,
+                fontWeight = FontWeight.Medium
             )
             Text(
                 text = subtitle,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = GtTextSecondary
             )
         }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = GtCyan,
-                checkedTrackColor = GtCyan.copy(alpha = 0.3f)
+                checkedThumbColor = GtMagicCyan,
+                checkedTrackColor = GtMagicCyan.copy(alpha = 0.3f),
+                uncheckedThumbColor = GtTextDisabled,
+                uncheckedTrackColor = GtBgDeep
             )
         )
     }

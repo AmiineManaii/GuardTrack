@@ -12,7 +12,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.guardiantrack.domain.model.Incident
@@ -31,11 +33,15 @@ fun HistoryScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showExportMenu by remember { mutableStateOf(false) }
 
+    val magicGradient = Brush.verticalGradient(
+        colors = listOf(GtBgDeep, GtBgSurface)
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(16.dp)
+            .background(magicGradient)
+            .padding(20.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -44,9 +50,11 @@ fun HistoryScreen(
         ) {
             Text(
                 text = "JOURNAL",
-                fontSize = 24.sp,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontFamily = FontFamily.SansSerif
+                fontSize = 28.sp,
+                color = GtMagicCyan,
+                fontFamily = FontFamily.SansSerif,
+                fontWeight = FontWeight.Black,
+                letterSpacing = 2.sp
             )
             
             AnimatedVisibility(
@@ -57,9 +65,10 @@ fun HistoryScreen(
                 Box {
                     Button(
                         onClick = { showExportMenu = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = GtCyan)
+                        colors = ButtonDefaults.buttonColors(containerColor = GtMagicCyan),
+                        shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Exporter", color = GtBgDeep)
+                        Text("Exporter", color = GtBgDeep, fontWeight = FontWeight.Bold)
                     }
 
                     DropdownMenu(
@@ -86,7 +95,7 @@ fun HistoryScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
         AnimatedContent(
             targetState = uiState.incidents.isEmpty() to uiState.isLoading,

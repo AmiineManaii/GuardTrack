@@ -153,6 +153,14 @@ class SurveillanceService : Service(), SensorEventListener {
     }
 
     private fun handleFallDetected() {
+        // Effet sonore de bip plus audible
+        try {
+            val toneG = android.media.ToneGenerator(android.media.AudioManager.STREAM_ALARM, 100)
+            toneG.startTone(android.media.ToneGenerator.TONE_PROP_BEEP, 300)
+        } catch (e: Exception) {
+            Log.e(TAG, "Erreur sonore: ${e.message}")
+        }
+
         serviceScope.launch {
             val (lat, lon) = getCurrentLocation()
 
@@ -205,7 +213,7 @@ class SurveillanceService : Service(), SensorEventListener {
         return NotificationCompat.Builder(this, CHANNEL_ID_SERVICE)
             .setContentTitle("GuardianTrack actif")
             .setContentText("Surveillance des capteurs en cours...")
-            .setSmallIcon(android.R.drawable.ic_dialog_alert)
+            .setSmallIcon(android.R.drawable.presence_online) // Icône en forme de cercle
             .setPriority(NotificationCompat.PRIORITY_LOW)
             .setOngoing(true)
             .build()

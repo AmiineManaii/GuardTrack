@@ -17,7 +17,7 @@ import com.example.guardiantrack.ui.theme.*
 @Composable
 fun StatusBadge(isSynced: Boolean) {
     val bgColor by animateColorAsState(
-        targetValue   = if (isSynced) GtGreenDim else GtAmberDim,
+        targetValue   = if (isSynced) GtGreen.copy(alpha = 0.2f) else GtAmber.copy(alpha = 0.2f),
         animationSpec = tween(400),
         label         = "badgeBg"
     )

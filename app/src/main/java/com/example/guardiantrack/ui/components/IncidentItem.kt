@@ -41,7 +41,7 @@ fun IncidentItem(
         backgroundContent = {
             val bgColor by animateColorAsState(
                 targetValue   = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart)
-                                    GtRedAlert else GtRedDim,
+                                    GtRedAlert.copy(alpha = 0.3f) else Color.Transparent,
                 animationSpec = tween(200),
                 label         = "swipeBg"
             )

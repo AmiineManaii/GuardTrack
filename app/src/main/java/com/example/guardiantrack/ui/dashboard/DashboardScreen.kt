@@ -13,6 +13,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -65,12 +67,16 @@ fun DashboardScreen(
         label = "magnitude"
     )
     
+    val magicGradient = Brush.verticalGradient(
+        colors = listOf(GtBgDeep, GtBgSurface)
+    )
+
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(magicGradient)
             .verticalScroll(rememberScrollState())
-            .padding(16.dp)
+            .padding(20.dp)
     ) {
         // Header
         Row(
@@ -81,10 +87,11 @@ fun DashboardScreen(
             Column {
                 Text(
                     text = "GUARDIAN",
-                    fontSize = 28.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontFamily = FontFamily.SansSerif
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Black,
+                    color = GtMagicCyan,
+                    fontFamily = FontFamily.SansSerif,
+                    letterSpacing = 2.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 AnimatedContent(
@@ -92,58 +99,69 @@ fun DashboardScreen(
                     transitionSpec = { fadeIn() togetherWith fadeOut() },
                     label = "serviceStatus"
                 ) { isRunning ->
-                    Text(
-                        text = if (isRunning) "SURVEILLANCE ACTIVE" else "SERVICE INACTIF",
-                        fontSize = 10.sp,
-                        color = if (isRunning) GtGreen else MaterialTheme.colorScheme.secondary,
-                        fontFamily = FontFamily.Monospace
-                    )
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(if (isRunning) GtGreen else GtRedAlert, RoundedCornerShape(4.dp))
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = if (isRunning) "SURVEILLANCE ACTIVE" else "SERVICE INACTIF",
+                            fontSize = 11.sp,
+                            color = if (isRunning) GtGreen else GtRedAlert,
+                            fontFamily = FontFamily.Monospace,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
 
             if (uiState.isServiceRunning) {
                 Box(contentAlignment = Alignment.Center) {
-                    RadarPulse(modifier = Modifier.size(40.dp))
+                    RadarPulse(modifier = Modifier.size(48.dp))
                     Box(
                         modifier = Modifier
-                            .size(12.dp)
+                            .size(14.dp)
                             .scale(pulseScale)
-                            .background(GtGreen, RoundedCornerShape(6.dp))
+                            .background(GtGreen, RoundedCornerShape(7.dp))
                     )
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
         // Main Card: Accelerometer
         ScanLineCard(
             isActive = uiState.isServiceRunning,
-            modifier = Modifier.fillMaxWidth().height(200.dp)
+            modifier = Modifier.fillMaxWidth().height(220.dp)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
                     text = "ACCÉLÉROMÈTRE",
-                    fontSize = 10.sp,
-                    color = GtTextSecondary,
-                    fontFamily = FontFamily.Monospace
+                    fontSize = 11.sp,
+                    color = GtMagicPurple,
+                    fontFamily = FontFamily.Monospace,
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
                 )
                 Spacer(modifier = Modifier.height(12.dp))
                 Row(verticalAlignment = Alignment.Bottom) {
                     Text(
                         text = String.format("%.2f", magnitudeAnimated),
-                        fontSize = 64.sp,
+                        fontSize = 72.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary,
+                        color = GtMagicCyan,
                         fontFamily = FontFamily.Monospace
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "m/s²",
-                        fontSize = 16.sp,
+                        fontSize = 18.sp,
                         color = GtTextSecondary,
                         fontFamily = FontFamily.Monospace,
-                        modifier = Modifier.padding(bottom = 12.dp)
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
                 }
 
@@ -151,68 +169,77 @@ fun DashboardScreen(
 
                 LinearProgressIndicator(
                     progress = { (magnitudeAnimated / 30f).coerceIn(0f, 1f) },
-                    modifier = Modifier.fillMaxWidth().height(6.dp),
+                    modifier = Modifier.fillMaxWidth().height(8.dp),
                     color = when {
                         magnitudeAnimated > 20f -> GtRedAlert
                         magnitudeAnimated > 15f -> GtAmber
-                        else -> MaterialTheme.colorScheme.primary
+                        else -> GtMagicCyan
                     },
-                    trackColor = MaterialTheme.colorScheme.outline,
+                    trackColor = GtBgDeep.copy(alpha = 0.5f),
+                    strokeCap = StrokeCap.Round
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
         // Grid: Battery and GPS
         Row(modifier = Modifier.fillMaxWidth()) {
-            GlassCard(modifier = Modifier.weight(1f).height(130.dp)) {
+            GlassCard(
+                modifier = Modifier.weight(1f).height(140.dp),
+                containerColor = GtBgCard.copy(alpha = 0.6f)
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "BATTERIE", fontSize = 9.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
+                    Text(text = "BATTERIE", fontSize = 10.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     val batteryColor = when {
                         uiState.batteryLevel <= 15 -> GtRedAlert
                         uiState.batteryLevel <= 30 -> GtAmber
                         else -> GtGreen
                     }
-                    Text(text = "${uiState.batteryLevel}%", fontSize = 36.sp, fontWeight = FontWeight.Bold, color = batteryColor, fontFamily = FontFamily.Monospace)
+                    Text(text = "${uiState.batteryLevel}%", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = batteryColor, fontFamily = FontFamily.Monospace)
                     Spacer(modifier = Modifier.weight(1f))
                     LinearProgressIndicator(
                         progress = { uiState.batteryLevel / 100f },
-                        modifier = Modifier.fillMaxWidth().height(4.dp),
+                        modifier = Modifier.fillMaxWidth().height(6.dp),
                         color = batteryColor,
-                        trackColor = MaterialTheme.colorScheme.outline,
+                        trackColor = GtBgDeep.copy(alpha = 0.5f),
+                        strokeCap = StrokeCap.Round
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(16.dp))
 
-            GlassCard(modifier = Modifier.weight(1f).height(130.dp)) {
+            GlassCard(
+                modifier = Modifier.weight(1f).height(140.dp),
+                containerColor = GtBgCard.copy(alpha = 0.6f)
+            ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(8.dp).background(if (uiState.isGpsActive) GtGreen else GtTextSecondary, RoundedCornerShape(4.dp)))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = if (uiState.isGpsActive) "GPS ACTIF" else "GPS INACTIF", fontSize = 9.sp, color = if (uiState.isGpsActive) GtGreen else GtTextSecondary, fontFamily = FontFamily.Monospace)
+                        Text(text = if (uiState.isGpsActive) "GPS ACTIF" else "GPS INACTIF", fontSize = 10.sp, color = if (uiState.isGpsActive) GtGreen else GtTextSecondary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                     }
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     uiState.lastLocation?.let { loc ->
                         Column {
                             Row {
-                                Text(text = "LAT: ", fontSize = 10.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
-                                Text(text = "%.5f".format(loc.latitude), fontSize = 11.sp, color = GtCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                                Text(text = "LAT: ", fontSize = 11.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
+                                Text(text = "%.5f".format(loc.latitude), fontSize = 12.sp, color = GtMagicCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                             }
+                            Spacer(modifier = Modifier.height(4.dp))
                             Row {
-                                Text(text = "LON: ", fontSize = 10.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
-                                Text(text = "%.5f".format(loc.longitude), fontSize = 11.sp, color = GtCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                                Text(text = "LON: ", fontSize = 11.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
+                                Text(text = "%.5f".format(loc.longitude), fontSize = 12.sp, color = GtMagicCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                             }
                         }
-                    } ?: Text(text = "RECHERCHE...", fontSize = 11.sp, color = GtCyan.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
+                    } ?: Text(text = "RECHERCHE...", fontSize = 12.sp, color = GtMagicCyan.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(40.dp))
 
         AlertButton(isLoading = uiState.isLoading, onClick = onAlertClick)
 
@@ -220,11 +247,13 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.height(16.dp))
             Snackbar(
                 modifier = Modifier.animateContentSize(),
-                action = { TextButton(onClick = { viewModel.clearAlertMessage() }) { Text("OK", color = GtCyan) } },
+                action = { TextButton(onClick = { viewModel.clearAlertMessage() }) { Text("OK", color = GtMagicCyan) } },
                 containerColor = GtBgCardElevated,
                 contentColor = GtTextPrimary,
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(16.dp)
             ) { Text(message) }
         }
+        
+        Spacer(modifier = Modifier.height(20.dp))
     }
 }

@@ -39,7 +39,7 @@ fun AlertButton(
         colors = ButtonDefaults.buttonColors(
             containerColor = GtRedAlert,
             contentColor   = GtTextPrimary,
-            disabledContainerColor = GtRedDim
+            disabledContainerColor = GtRedAlert.copy(alpha = 0.3f)
         ),
         enabled = !isLoading
     ) {

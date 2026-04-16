@@ -8,15 +8,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val GuardianDarkColorScheme = darkColorScheme(
-    primary = GtCyan,
-    secondary = GtRedAlert,
-    tertiary = GtAmber,
+    primary = GtMagicCyan,
+    secondary = GtMagicPurple,
+    tertiary = GtMagicPink,
     background = GtBgDeep,
     surface = GtBgSurface,
     surfaceVariant = GtBgCard,
     onPrimary = GtBgDeep,
-    onSecondary = GtTextPrimary,
-    onTertiary = GtBgDeep,
+    onSecondary = Color.White,
+    onTertiary = Color.White,
     onBackground = GtTextPrimary,
     onSurface = GtTextPrimary,
     onSurfaceVariant = GtTextSecondary,
@@ -26,19 +26,19 @@ private val GuardianDarkColorScheme = darkColorScheme(
 )
 
 private val GuardianLightColorScheme = lightColorScheme(
-    primary = GtCyan,
-    secondary = GtRedAlert,
-    tertiary = GtAmber,
-    background = Color(0xFFF5F8FF),
-    surface = Color(0xFFE8F0FA),
-    surfaceVariant = Color(0xFFFFFFFF),
+    primary = GtMagicPurple,
+    secondary = GtMagicCyan,
+    tertiary = GtMagicPink,
+    background = Color(0xFFF8FAFC),
+    surface = Color(0xFFF1F5F9),
+    surfaceVariant = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Color(0xFF0D1520),
-    onSurface = Color(0xFF0D1520),
-    onSurfaceVariant = Color(0xFF5D6B82),
-    outline = Color(0xFFD1E0F5),
+    onBackground = Color(0xFF0F172A),
+    onSurface = Color(0xFF0F172A),
+    onSurfaceVariant = Color(0xFF64748B),
+    outline = Color(0xFFE2E8F0),
     error = GtRedAlert,
     onError = Color.White
 )
