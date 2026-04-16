@@ -45,6 +45,7 @@ fun IncidentItem(
                 animationSpec = tween(200),
                 label         = "swipeBg"
             )
+            val isDark = LocalThemeIsDark.current
             Box(
                 modifier          = Modifier.fillMaxSize()
                     .background(bgColor, MaterialTheme.shapes.medium),
@@ -55,14 +56,15 @@ fun IncidentItem(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
-                    Text("Supprimer", style = MaterialTheme.typography.labelLarge, color = GtTextPrimary)
-                    Icon(Icons.Outlined.Delete, null, tint = GtTextPrimary, modifier = Modifier.size(20.dp))
+                    Text("Supprimer", style = MaterialTheme.typography.labelLarge, color = if (isDark) GtTextPrimary else GtBgDeep)
+                    Icon(Icons.Outlined.Delete, null, tint = if (isDark) GtTextPrimary else GtBgDeep, modifier = Modifier.size(20.dp))
                 }
             }
         },
         modifier = modifier
     ) {
         GlassCard {
+            val isDark = LocalThemeIsDark.current
             Row(
                 modifier          = Modifier.padding(16.dp),
                 verticalAlignment = Alignment.CenterVertically,
@@ -72,7 +74,7 @@ fun IncidentItem(
                 val (icon: ImageVector, typeColor: Color) = when (incident.type) {
                     IncidentType.FALL    -> Icons.Outlined.ErrorOutline to GtRedAlert
                     IncidentType.BATTERY -> Icons.Outlined.BatteryAlert   to GtAmber
-                    IncidentType.MANUAL  -> Icons.Outlined.Warning         to GtCyan
+                    IncidentType.MANUAL  -> Icons.Outlined.Warning         to (if (isDark) GtCyan else GtBgDeep)
                 }
 
                 Box(
@@ -94,12 +96,12 @@ fun IncidentItem(
                     Text(
                         "${incident.formattedDate}  ${incident.formattedTime}",
                         style = MaterialTheme.typography.titleSmall,
-                        color = GtTextSecondary
+                        color = if (isDark) GtTextSecondary else Color.Gray
                     )
                     val coordsText = if (incident.latitude == 0.0 && incident.longitude == 0.0)
                         "Localisation indisponible"
                     else "%.5f, %.5f".format(incident.latitude, incident.longitude)
-                    Text(coordsText, fontSize = 10.sp, color = GtTextDisabled)
+                    Text(coordsText, fontSize = 10.sp, color = if (isDark) GtTextDisabled else Color.Gray.copy(alpha = 0.6f))
                 }
 
                 StatusBadge(isSynced = incident.isSynced)

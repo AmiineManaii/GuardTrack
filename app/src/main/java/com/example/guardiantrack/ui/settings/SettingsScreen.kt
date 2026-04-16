@@ -268,18 +268,18 @@ private fun MagicSection(
     title: String,
     content: @Composable ColumnScope.() -> Unit
 ) {
+    val isDark = LocalThemeIsDark.current
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = title,
             fontSize = 13.sp,
             fontWeight = FontWeight.Bold,
-            color = GtMagicPurple,
+            color = if (isDark) GtMagicPurple else GtBgDeep,
             letterSpacing = 1.sp,
             modifier = Modifier.padding(start = 8.dp, bottom = 12.dp)
         )
         GlassCard(
-            modifier = Modifier.fillMaxWidth(),
-            containerColor = GtBgCard.copy(alpha = 0.6f)
+            modifier = Modifier.fillMaxWidth()
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
                 content()
@@ -295,6 +295,7 @@ private fun SettingsSwitchRow(
     checked: Boolean,
     onCheckedChange: (Boolean) -> Unit
 ) {
+    val isDark = LocalThemeIsDark.current
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -304,23 +305,23 @@ private fun SettingsSwitchRow(
             Text(
                 text = title,
                 fontSize = 16.sp,
-                color = GtTextPrimary,
+                color = if (isDark) GtTextPrimary else GtBgDeep,
                 fontWeight = FontWeight.Medium
             )
             Text(
                 text = subtitle,
                 fontSize = 12.sp,
-                color = GtTextSecondary
+                color = if (isDark) GtTextSecondary else Color.Gray
             )
         }
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = GtMagicCyan,
-                checkedTrackColor = GtMagicCyan.copy(alpha = 0.3f),
+                checkedThumbColor = if (isDark) GtMagicCyan else GtBgDeep,
+                checkedTrackColor = if (isDark) GtMagicCyan.copy(alpha = 0.3f) else GtBgDeep.copy(alpha = 0.3f),
                 uncheckedThumbColor = GtTextDisabled,
-                uncheckedTrackColor = GtBgDeep
+                uncheckedTrackColor = if (isDark) GtBgDeep else Color.LightGray
             )
         )
     }
