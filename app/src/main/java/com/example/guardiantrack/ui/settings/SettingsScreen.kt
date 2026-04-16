@@ -2,6 +2,7 @@ package com.example.guardiantrack.ui.settings
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,9 +35,12 @@ fun SettingsScreen(
     var contactPhone by remember { mutableStateOf("") }
     var showSavedMessage by remember { mutableStateOf(false) }
 
-    val magicGradient = Brush.verticalGradient(
-        colors = listOf(GtBgDeep, GtBgSurface)
-    )
+    val isDark = LocalThemeIsDark.current
+    val magicGradient = if (isDark) {
+        Brush.verticalGradient(colors = listOf(GtBgDeep, GtBgSurface))
+    } else {
+        Brush.verticalGradient(colors = listOf(Color.White, Color.White))
+    }
 
     Column(
         modifier = modifier
@@ -48,7 +52,7 @@ fun SettingsScreen(
         Text(
             text = "CONFIGURATION",
             fontSize = 28.sp,
-            color = GtMagicCyan,
+            color = if (isDark) GtMagicCyan else GtBgDeep,
             fontFamily = FontFamily.SansSerif,
             fontWeight = FontWeight.Black,
             letterSpacing = 2.sp
@@ -65,7 +69,7 @@ fun SettingsScreen(
                 Text(
                     text = "Seuil de détection d'impact",
                     fontSize = 14.sp,
-                    color = GtTextSecondary,
+                    color = if (isDark) GtTextSecondary else GtBgDeep.copy(alpha = 0.7f),
                     modifier = Modifier.padding(bottom = 24.dp)
                 )
                 
@@ -73,7 +77,8 @@ fun SettingsScreen(
                     value = uiState.threshold,
                     onValueChange = { viewModel.setThreshold(it) },
                     valueRange = 5f..30f,
-                    size = 180.dp
+                    size = 180.dp,
+                    activeColor = if (isDark) GtMagicCyan else GtBgDeep
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -82,7 +87,7 @@ fun SettingsScreen(
                     text = if (uiState.threshold < 12f) "Sensibilité Élevée" 
                            else if (uiState.threshold < 20f) "Sensibilité Normale" 
                            else "Sensibilité Basse",
-                    color = if (uiState.threshold < 12f) GtRedAlert else if (uiState.threshold < 20f) GtGreen else GtAmber,
+                    color = if (uiState.threshold < 12f) GtRedAlert else if (uiState.threshold < 20f) (if (isDark) GtGreen else GtBgDeep) else GtAmber,
                     fontWeight = FontWeight.Bold,
                     fontSize = 14.sp
                 )
@@ -100,14 +105,14 @@ fun SettingsScreen(
                 onCheckedChange = { viewModel.setSmsSimulation(it) }
             )
             
-            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = GtDivider)
+            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp), color = if (isDark) GtDivider else Color.LightGray.copy(alpha = 0.5f))
             
             Column {
                 Text(
                     text = "Numéro d'urgence principal",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
-                    color = GtTextPrimary,
+                    color = if (isDark) GtTextPrimary else GtBgDeep,
                     modifier = Modifier.padding(bottom = 12.dp)
                 )
                 Row(
@@ -119,16 +124,16 @@ fun SettingsScreen(
                         onValueChange = { emergencyNumber = it.filter { c -> c.isDigit() } },
                         modifier = Modifier.weight(1f),
                         placeholder = {
-                            Text("+216 XX XXX XXX", color = GtTextSecondary.copy(alpha = 0.5f))
+                            Text("+216 XX XXX XXX", color = if (isDark) GtTextSecondary.copy(alpha = 0.5f) else Color.Gray)
                         },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         singleLine = true,
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GtMagicCyan,
-                            unfocusedBorderColor = GtBorderSubtle,
-                            focusedTextColor = GtTextPrimary,
-                            unfocusedTextColor = GtTextPrimary,
-                            cursorColor = GtMagicCyan
+                            focusedBorderColor = if (isDark) GtMagicCyan else GtBgDeep,
+                            unfocusedBorderColor = if (isDark) GtBorderSubtle else Color.LightGray,
+                            focusedTextColor = if (isDark) GtTextPrimary else GtBgDeep,
+                            unfocusedTextColor = if (isDark) GtTextPrimary else GtBgDeep,
+                            cursorColor = if (isDark) GtMagicCyan else GtBgDeep
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -137,11 +142,11 @@ fun SettingsScreen(
                             viewModel.setEmergencyNumber(emergencyNumber)
                             showSavedMessage = true
                         },
-                        colors = ButtonDefaults.buttonColors(containerColor = GtMagicCyan),
-                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = if (isDark) GtMagicCyan else GtBgDeep),
+                        shape = RoundedCornerShape(12.dp),
                         modifier = Modifier.height(56.dp)
                     ) {
-                        Text("SAVE", color = GtBgDeep, fontWeight = FontWeight.Bold)
+                        Text("SAVE", color = if (isDark) GtBgDeep else Color.White, fontWeight = FontWeight.Bold)
                     }
                 }
 
@@ -153,7 +158,7 @@ fun SettingsScreen(
                     Text(
                         text = "✓ Configuré avec succès",
                         fontSize = 12.sp,
-                        color = GtGreen,
+                        color = if (isDark) GtGreen else GtBgDeep,
                         modifier = Modifier.padding(top = 8.dp)
                     )
                 }
@@ -183,12 +188,12 @@ fun SettingsScreen(
                     label = { Text("Nom complet") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = GtMagicPurple,
-                        unfocusedBorderColor = GtBorderSubtle,
-                        focusedTextColor = GtTextPrimary,
-                        unfocusedTextColor = GtTextPrimary,
-                        focusedLabelColor = GtMagicPurple,
-                        unfocusedLabelColor = GtTextSecondary
+                        focusedBorderColor = if (isDark) GtMagicPurple else GtBgDeep,
+                        unfocusedBorderColor = if (isDark) GtBorderSubtle else Color.LightGray,
+                        focusedTextColor = if (isDark) GtTextPrimary else GtBgDeep,
+                        unfocusedTextColor = if (isDark) GtTextPrimary else GtBgDeep,
+                        focusedLabelColor = if (isDark) GtMagicPurple else GtBgDeep,
+                        unfocusedLabelColor = if (isDark) GtTextSecondary else Color.Gray
                     ),
                     shape = RoundedCornerShape(16.dp)
                 )
@@ -204,12 +209,12 @@ fun SettingsScreen(
                         modifier = Modifier.weight(1f),
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = GtMagicPurple,
-                            unfocusedBorderColor = GtBorderSubtle,
-                            focusedTextColor = GtTextPrimary,
-                            unfocusedTextColor = GtTextPrimary,
-                            focusedLabelColor = GtMagicPurple,
-                            unfocusedLabelColor = GtTextSecondary
+                            focusedBorderColor = if (isDark) GtMagicPurple else GtBgDeep,
+                            unfocusedBorderColor = if (isDark) GtBorderSubtle else Color.LightGray,
+                            focusedTextColor = if (isDark) GtTextPrimary else GtBgDeep,
+                            unfocusedTextColor = if (isDark) GtTextPrimary else GtBgDeep,
+                            focusedLabelColor = if (isDark) GtMagicPurple else GtBgDeep,
+                            unfocusedLabelColor = if (isDark) GtTextSecondary else Color.Gray
                         ),
                         shape = RoundedCornerShape(16.dp)
                     )
@@ -223,7 +228,7 @@ fun SettingsScreen(
                         },
                         modifier = Modifier
                             .size(56.dp)
-                            .background(GtMagicPurple, RoundedCornerShape(16.dp))
+                            .background(if (isDark) GtMagicPurple else GtBgDeep, RoundedCornerShape(16.dp))
                     ) {
                         Text("+", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
                     }
@@ -236,14 +241,14 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 8.dp)
-                                .background(Color.White.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
+                                .background(if (isDark) Color.White.copy(alpha = 0.05f) else Color.Black.copy(alpha = 0.05f), RoundedCornerShape(12.dp))
                                 .padding(12.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Column {
-                                Text(contact.name, color = GtTextPrimary, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
-                                Text(contact.phoneNumber, color = GtTextSecondary, fontSize = 13.sp)
+                                Text(contact.name, color = if (isDark) GtTextPrimary else GtBgDeep, fontSize = 15.sp, fontWeight = FontWeight.SemiBold)
+                                Text(contact.phoneNumber, color = if (isDark) GtTextSecondary else Color.Gray, fontSize = 13.sp)
                             }
                             IconButton(onClick = { viewModel.deleteContact(contact.id) }) {
                                 Text("✕", color = GtRedAlert.copy(alpha = 0.8f))

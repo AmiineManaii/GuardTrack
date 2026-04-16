@@ -5,7 +5,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
+
+val LocalThemeIsDark = staticCompositionLocalOf { false }
 
 private val GuardianDarkColorScheme = darkColorScheme(
     primary = GtMagicCyan,
@@ -29,16 +33,16 @@ private val GuardianLightColorScheme = lightColorScheme(
     primary = GtMagicPurple,
     secondary = GtMagicCyan,
     tertiary = GtMagicPink,
-    background = Color(0xFFF8FAFC),
-    surface = Color(0xFFF1F5F9),
+    background = Color.White,
+    surface = Color.White,
     surfaceVariant = Color.White,
     onPrimary = Color.White,
     onSecondary = Color.White,
     onTertiary = Color.White,
-    onBackground = Color(0xFF0F172A),
-    onSurface = Color(0xFF0F172A),
-    onSurfaceVariant = Color(0xFF64748B),
-    outline = Color(0xFFE2E8F0),
+    onBackground = GtBgDeep,
+    onSurface = GtBgDeep,
+    onSurfaceVariant = GtTextSecondary,
+    outline = GtBgDeep,
     error = GtRedAlert,
     onError = Color.White
 )
@@ -50,8 +54,10 @@ fun GuardianTrackTheme(
 ) {
     val colorScheme = if (darkTheme) GuardianDarkColorScheme else GuardianLightColorScheme
 
-    MaterialTheme(
-        colorScheme = colorScheme,
-        content = content
-    )
+    CompositionLocalProvider(LocalThemeIsDark provides darkTheme) {
+        MaterialTheme(
+            colorScheme = colorScheme,
+            content = content
+        )
+    }
 }

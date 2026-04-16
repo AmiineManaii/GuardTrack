@@ -12,22 +12,38 @@ import com.example.guardiantrack.ui.theme.GtBorderSubtle
 
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.ui.graphics.Color
+import com.example.guardiantrack.ui.theme.GtBgDeep
 import com.example.guardiantrack.ui.theme.GtMagicPurple
+import com.example.guardiantrack.ui.theme.LocalThemeIsDark
 
 @Composable
 fun GlassCard(
     modifier : Modifier = Modifier,
-    containerColor: Color = GtBgCard.copy(alpha = 0.4f),
-    borderColor: Color = GtBorderSubtle,
+    containerColor: Color? = null,
+    borderColor: Color? = null,
     content  : @Composable () -> Unit
 ) {
+    val isDark = LocalThemeIsDark.current
+    
+    val finalContainerColor = containerColor ?: if (isDark) {
+        GtBgCard.copy(alpha = 0.4f)
+    } else {
+        Color.White // Fond blanc pur en mode clair
+    }
+    
+    val finalBorderColor = borderColor ?: if (isDark) {
+        GtBorderSubtle
+    } else {
+        GtBgDeep.copy(alpha = 0.5f) // Bordure GtBgDeep en mode clair
+    }
+
     Surface(
         modifier      = modifier
             .clip(MaterialTheme.shapes.medium)
-            .border(1.dp, borderColor, MaterialTheme.shapes.medium),
-        color         = containerColor,
+            .border(1.dp, finalBorderColor, MaterialTheme.shapes.medium),
+        color         = finalContainerColor,
         tonalElevation = 0.dp,
-        shadowElevation = 0.dp,
+        shadowElevation = if (isDark) 0.dp else 4.dp, // Plus d'ombre en mode clair
         content       = content
     )
 }

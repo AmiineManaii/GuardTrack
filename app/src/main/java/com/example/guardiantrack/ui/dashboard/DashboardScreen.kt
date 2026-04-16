@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -14,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -67,9 +69,12 @@ fun DashboardScreen(
         label = "magnitude"
     )
     
-    val magicGradient = Brush.verticalGradient(
-        colors = listOf(GtBgDeep, GtBgSurface)
-    )
+    val isDark = LocalThemeIsDark.current
+    val magicGradient = if (isDark) {
+        Brush.verticalGradient(colors = listOf(GtBgDeep, GtBgSurface))
+    } else {
+        Brush.verticalGradient(colors = listOf(Color.White, Color.White))
+    }
 
     Column(
         modifier = modifier
@@ -89,7 +94,7 @@ fun DashboardScreen(
                     text = "GUARDIAN",
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Black,
-                    color = GtMagicCyan,
+                    color = if (isDark) GtMagicCyan else GtBgDeep,
                     fontFamily = FontFamily.SansSerif,
                     letterSpacing = 2.sp
                 )
@@ -135,13 +140,15 @@ fun DashboardScreen(
         // Main Card: Accelerometer
         ScanLineCard(
             isActive = uiState.isServiceRunning,
-            modifier = Modifier.fillMaxWidth().height(220.dp)
+            modifier = Modifier.fillMaxWidth().height(220.dp),
+            containerColor = if (isDark) GtBgCard.copy(alpha = 0.4f) else Color.White,
+            borderColor = if (isDark) GtBorderSubtle else GtBgDeep.copy(alpha = 0.5f)
         ) {
             Column(modifier = Modifier.padding(24.dp)) {
                 Text(
                     text = "ACCÉLÉROMÈTRE",
                     fontSize = 11.sp,
-                    color = GtMagicPurple,
+                    color = if (isDark) GtMagicPurple else GtBgDeep,
                     fontFamily = FontFamily.Monospace,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
@@ -152,14 +159,14 @@ fun DashboardScreen(
                         text = String.format("%.2f", magnitudeAnimated),
                         fontSize = 72.sp,
                         fontWeight = FontWeight.Bold,
-                        color = GtMagicCyan,
+                        color = if (isDark) GtMagicCyan else GtBgDeep,
                         fontFamily = FontFamily.Monospace
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = "m/s²",
                         fontSize = 18.sp,
-                        color = GtTextSecondary,
+                        color = if (isDark) GtTextSecondary else GtBgDeep.copy(alpha = 0.7f),
                         fontFamily = FontFamily.Monospace,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
@@ -173,9 +180,9 @@ fun DashboardScreen(
                     color = when {
                         magnitudeAnimated > 20f -> GtRedAlert
                         magnitudeAnimated > 15f -> GtAmber
-                        else -> GtMagicCyan
+                        else -> if (isDark) GtMagicCyan else GtBgDeep
                     },
-                    trackColor = GtBgDeep.copy(alpha = 0.5f),
+                    trackColor = if (isDark) GtBgDeep.copy(alpha = 0.5f) else Color.LightGray.copy(alpha = 0.3f),
                     strokeCap = StrokeCap.Round
                 )
             }
@@ -186,24 +193,23 @@ fun DashboardScreen(
         // Grid: Battery and GPS
         Row(modifier = Modifier.fillMaxWidth()) {
             GlassCard(
-                modifier = Modifier.weight(1f).height(140.dp),
-                containerColor = GtBgCard.copy(alpha = 0.6f)
+                modifier = Modifier.weight(1f).height(140.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    Text(text = "BATTERIE", fontSize = 10.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                    Text(text = "BATTERIE", fontSize = 10.sp, color = if (isDark) GtTextSecondary else GtBgDeep, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     val batteryColor = when {
                         uiState.batteryLevel <= 15 -> GtRedAlert
                         uiState.batteryLevel <= 30 -> GtAmber
-                        else -> GtGreen
+                        else -> if (isDark) GtGreen else GtBgDeep
                     }
-                    Text(text = "${uiState.batteryLevel}%", fontSize = 40.sp, fontWeight = FontWeight.Bold, color = batteryColor, fontFamily = FontFamily.Monospace)
+                    Text(text = "${uiState.batteryLevel}%", fontSize = 40.sp, fontWeight = FontWeight.Black, color = batteryColor, fontFamily = FontFamily.Monospace)
                     Spacer(modifier = Modifier.weight(1f))
                     LinearProgressIndicator(
                         progress = { uiState.batteryLevel / 100f },
                         modifier = Modifier.fillMaxWidth().height(6.dp),
                         color = batteryColor,
-                        trackColor = GtBgDeep.copy(alpha = 0.5f),
+                        trackColor = if (isDark) GtBgDeep.copy(alpha = 0.5f) else Color.LightGray.copy(alpha = 0.3f),
                         strokeCap = StrokeCap.Round
                     )
                 }
@@ -212,29 +218,28 @@ fun DashboardScreen(
             Spacer(modifier = Modifier.width(16.dp))
 
             GlassCard(
-                modifier = Modifier.weight(1f).height(140.dp),
-                containerColor = GtBgCard.copy(alpha = 0.6f)
+                modifier = Modifier.weight(1f).height(140.dp)
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Box(modifier = Modifier.size(8.dp).background(if (uiState.isGpsActive) GtGreen else GtTextSecondary, RoundedCornerShape(4.dp)))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = if (uiState.isGpsActive) "GPS ACTIF" else "GPS INACTIF", fontSize = 10.sp, color = if (uiState.isGpsActive) GtGreen else GtTextSecondary, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                        Text(text = if (uiState.isGpsActive) "GPS ACTIF" else "GPS INACTIF", fontSize = 10.sp, color = if (uiState.isGpsActive) GtGreen else if (isDark) GtTextSecondary else GtBgDeep, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                     }
                     Spacer(modifier = Modifier.height(16.dp))
                     uiState.lastLocation?.let { loc ->
                         Column {
                             Row {
-                                Text(text = "LAT: ", fontSize = 11.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
-                                Text(text = "%.5f".format(loc.latitude), fontSize = 12.sp, color = GtMagicCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                                Text(text = "LAT: ", fontSize = 11.sp, color = if (isDark) GtTextSecondary else GtBgDeep, fontFamily = FontFamily.Monospace)
+                                Text(text = "%.5f".format(loc.latitude), fontSize = 12.sp, color = if (isDark) GtMagicCyan else GtBgDeep, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                             }
                             Spacer(modifier = Modifier.height(4.dp))
                             Row {
-                                Text(text = "LON: ", fontSize = 11.sp, color = GtTextSecondary, fontFamily = FontFamily.Monospace)
-                                Text(text = "%.5f".format(loc.longitude), fontSize = 12.sp, color = GtMagicCyan, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
+                                Text(text = "LON: ", fontSize = 11.sp, color = if (isDark) GtTextSecondary else GtBgDeep, fontFamily = FontFamily.Monospace)
+                                Text(text = "%.5f".format(loc.longitude), fontSize = 12.sp, color = if (isDark) GtMagicCyan else GtBgDeep, fontFamily = FontFamily.Monospace, fontWeight = FontWeight.Bold)
                             }
                         }
-                    } ?: Text(text = "RECHERCHE...", fontSize = 12.sp, color = GtMagicCyan.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
+                    } ?: Text(text = "RECHERCHE...", fontSize = 12.sp, color = if (isDark) GtMagicCyan.copy(alpha = 0.5f) else GtBgDeep.copy(alpha = 0.5f), fontFamily = FontFamily.Monospace)
                 }
             }
         }

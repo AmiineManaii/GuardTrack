@@ -4,6 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -13,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -33,9 +35,12 @@ fun HistoryScreen(
     val uiState by viewModel.uiState.collectAsState()
     var showExportMenu by remember { mutableStateOf(false) }
 
-    val magicGradient = Brush.verticalGradient(
-        colors = listOf(GtBgDeep, GtBgSurface)
-    )
+    val isDark = LocalThemeIsDark.current
+    val magicGradient = if (isDark) {
+        Brush.verticalGradient(colors = listOf(GtBgDeep, GtBgSurface))
+    } else {
+        Brush.verticalGradient(colors = listOf(Color.White, Color.White))
+    }
 
     Column(
         modifier = modifier
@@ -51,7 +56,7 @@ fun HistoryScreen(
             Text(
                 text = "JOURNAL",
                 fontSize = 28.sp,
-                color = GtMagicCyan,
+                color = if (isDark) GtMagicCyan else GtBgDeep,
                 fontFamily = FontFamily.SansSerif,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 2.sp
@@ -65,26 +70,26 @@ fun HistoryScreen(
                 Box {
                     Button(
                         onClick = { showExportMenu = true },
-                        colors = ButtonDefaults.buttonColors(containerColor = GtMagicCyan),
+                        colors = ButtonDefaults.buttonColors(containerColor = if (isDark) GtMagicCyan else GtBgDeep),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("Exporter", color = GtBgDeep, fontWeight = FontWeight.Bold)
+                        Text("Exporter", color = if (isDark) GtBgDeep else Color.White, fontWeight = FontWeight.Bold)
                     }
 
                     DropdownMenu(
                         expanded = showExportMenu,
                         onDismissRequest = { showExportMenu = false },
-                        modifier = Modifier.background(GtBgCard)
+                        modifier = Modifier.background(if (isDark) GtBgCard else Color.White)
                     ) {
                         DropdownMenuItem(
-                            text = { Text("CSV", color = GtTextPrimary) },
+                            text = { Text("CSV", color = if (isDark) GtTextPrimary else GtBgDeep) },
                             onClick = {
                                 showExportMenu = false
                                 onExportCsv()
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("TEXTE", color = GtTextPrimary) },
+                            text = { Text("TEXTE", color = if (isDark) GtTextPrimary else GtBgDeep) },
                             onClick = {
                                 showExportMenu = false
                                 onExportTxt()
@@ -111,7 +116,7 @@ fun HistoryScreen(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator(color = GtCyan)
+                        CircularProgressIndicator(color = if (isDark) GtMagicCyan else GtBgDeep)
                     }
                 }
                 isEmpty -> {
@@ -128,7 +133,7 @@ fun HistoryScreen(
                             Text(
                                 text = "Aucun incident enregistré",
                                 fontSize = 14.sp,
-                                color = GtTextSecondary
+                                color = if (isDark) GtTextSecondary else GtBgDeep.copy(alpha = 0.6f)
                             )
                         }
                     }
@@ -146,7 +151,7 @@ fun HistoryScreen(
                             IncidentItem(
                                 incident = incident,
                                 onDeleteClick = { viewModel.deleteIncident(incident.id) },
-                                modifier = Modifier.animateItemPlacement()
+                                modifier = Modifier.animateItem()
                             )
                         }
                     }
@@ -155,5 +160,3 @@ fun HistoryScreen(
         }
     }
 }
-
-// L'ancienne implémentation de IncidentItem est supprimée car elle est maintenant dans com.example.guardiantrack.ui.components

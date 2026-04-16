@@ -9,13 +9,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import com.example.guardiantrack.ui.theme.GtCyan
 
+import androidx.compose.ui.graphics.Color
+import com.example.guardiantrack.ui.theme.GtBgCard
+import com.example.guardiantrack.ui.theme.GtBorderSubtle
+
 @Composable
 fun ScanLineCard(
     isActive : Boolean,
     modifier : Modifier = Modifier,
+    containerColor: Color = GtBgCard.copy(alpha = 0.4f),
+    borderColor: Color = GtBorderSubtle,
     content  : @Composable () -> Unit
 ) {
-    GlassCard(modifier = modifier) {
+    GlassCard(
+        modifier = modifier,
+        containerColor = containerColor,
+        borderColor = borderColor
+    ) {
         Box {
             content()
 
