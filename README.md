@@ -8,13 +8,13 @@ Projet réalisé dans le cadre du module Développement Android — ISET Rades (
 
 ## ✨ Fonctionnalités (Mode BONUS +10 pts)
 
-- **🚀 Jetpack Compose & Material 3** : Interface moderne 100% déclarative sans XML.
-- **🧪 Détection de Chute en 2 Phases** : Algorithme utilisant l'accéléromètre avec **Filtre Passe-Bas** (Low-Pass Filter) pour réduire le bruit et les faux positifs.
-- **📡 Surveillance en Arrière-plan** : Foreground Service robuste avec notifications persistantes.
-- **📱 Alerte SMS Automatique** : Envoi de SMS d'urgence (avec mode simulation sécurisé) au contact configuré.
-- **📍 Géolocalisation Précise** : Tagging GPS des incidents (Chute, Batterie faible, Alerte manuelle).
-- **🔐 Sécurité Avancée** : Chiffrement AES-256 des données sensibles (numéro d'urgence) via `EncryptedSharedPreferences`.
-- **📊 Export de Données** : Exportation du journal des incidents en format CSV via MediaStore.
+- **🚀 Jetpack Compose & Material 3** : Interface "Magic" moderne 100% déclarative avec thèmes personnalisés (Cosmic Violet, Electric Cyan).
+- **🎨 Thème Intelligent** : Mode sombre "Cockpit" et mode clair "Pure White" gérés directement dans l'application (indépendamment du système).
+- **🧪 Détection de Chute en 2 Phases** : Algorithme optimisé avec **Filtre Passe-Bas**, alerte sonore instantanée (**Bip**) et icône de notification circulaire.
+- **📱 Alerte SMS Automatique** : Envoi de SMS d'urgence réels avec **gestion intelligente des messages longs** (Multipart) ou mode simulation.
+- **⚙️ Sensibilité Radio** : Ajustement ultra-précis via un **Slider Circulaire** interactif style radio vintage.
+- **📍 Géolocalisation Précise** : Tagging GPS des incidents avec lien Google Maps dans les SMS.
+- **📊 Export de Données** : Exportation du journal des incidents (CSV/TXT) avec **Toasts de confirmation** et gestion d'erreurs.
 - **🔄 Synchronisation Cloud** : Offline-first avec Room et synchronisation automatique via Retrofit + WorkManager.
 - **🧪 Tests Unitaires** : Couverture de test robuste avec JUnit, MockK et Turbine.
 

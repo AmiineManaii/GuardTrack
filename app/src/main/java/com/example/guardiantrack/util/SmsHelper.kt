@@ -12,6 +12,10 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
+import android.os.Handler
+import android.os.Looper
+import android.widget.Toast
+
 @Singleton
 class SmsHelper @Inject constructor(
     @ApplicationContext private val context: Context,
@@ -53,10 +57,14 @@ class SmsHelper @Inject constructor(
                 }
                 
                 Log.i(TAG, "REAL SMS sent to $phoneNumber")
-                android.widget.Toast.makeText(context, "SMS d'urgence envoyé à $phoneNumber", android.widget.Toast.LENGTH_LONG).show()
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, "SMS d'urgence envoyé à $phoneNumber", Toast.LENGTH_LONG).show()
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "SMS send failed: ${e.message}")
-                android.widget.Toast.makeText(context, "Erreur lors de l'envoi du SMS: ${e.message}", android.widget.Toast.LENGTH_LONG).show()
+                Handler(Looper.getMainLooper()).post {
+                    Toast.makeText(context, "Erreur lors de l'envoi du SMS: ${e.message}", Toast.LENGTH_LONG).show()
+                }
             }
         }
     }
